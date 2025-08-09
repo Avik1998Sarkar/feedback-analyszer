@@ -156,7 +156,7 @@ function App() {
         <div
             className="container-fluid min-vh-100 d-flex align-items-center justify-content-center"
             style={{
-                background: "linear-gradient(135deg, #5a8ec2ff, #f8f9fa, #436485ff)",
+                background: "linear-gradient(135deg, #5a8ec2ff, #ada594ff, #436485ff)",
                 padding: "20px",
             }}
         >

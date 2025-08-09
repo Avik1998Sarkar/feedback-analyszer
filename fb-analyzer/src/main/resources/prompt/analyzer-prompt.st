@@ -9,18 +9,21 @@ Instructions:
 "summary": "Not related",
 "sentiment_type": "N/A",
 "score": "N/A",
-"based_on": "both"
+"based_on": "Unable to recognize both Text and Image summaries"
 
 
-- If ONLY the text summary is related, respond based on the text summary.
-- If ONLY the image summary is related, respond based on the image summary.
+- If ONLY the text summary is related, "Respond only based on the text summary [Image not present / Image not related]"
+- If ONLY the image summary is related, "Respond only based on the image summary [Text not related]"
 - If BOTH are related, combine both summaries for your analysis.
 
 Respond in this format and make json with below fields:
 "summary": (brief summary),
 "sentiment_type": (POSITIVE, NEUTRAL, or NEGATIVE),
 "score": (decimal between -1 and 1),
-"based_on": text, image, or both
+"based_on": [
+            "Respond only based on the text summary [Image not present / Image not related]",
+            "Respond only based on the image summary [Text not related]",
+            or "Unable to recognize both Text and Image summaries"]
 
 Final output should be a JSON object with the above fields.
 Make sure to provide a concise and accurate summary based on the feedback provided.
