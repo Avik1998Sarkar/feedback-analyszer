@@ -3,6 +3,7 @@ package com.feedback.fb_analyzer.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.fb_analyzer.model.FbAnalyzerModel;
+import com.feedback.fb_analyzer.repository.FbAnalyzerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -15,6 +16,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -23,6 +25,7 @@ public class FbAnalyzerService {
 
     private final ChatClient chatClient;
     private final ChatModel chatModel;
+    private final FbAnalyzerRepository fbAnalyzerRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${company.name}")
@@ -31,9 +34,10 @@ public class FbAnalyzerService {
     @Value("classpath:prompt/analyzer-prompt.st")
     public Resource prompt_template;
 
-    public FbAnalyzerService(ChatClient.Builder chatClient, ChatModel chatModel) {
+    public FbAnalyzerService(ChatClient.Builder chatClient, ChatModel chatModel, FbAnalyzerRepository fbAnalyzerRepository) {
         this.chatClient = chatClient.build();
         this.chatModel = chatModel;
+        this.fbAnalyzerRepository = fbAnalyzerRepository;
     }
 
     public FbAnalyzerModel analyzeFeedback(MultipartFile file, String feedbackContent) throws JsonProcessingException {
@@ -50,7 +54,9 @@ public class FbAnalyzerService {
                 .prompt(prompt)
                 .call()
                 .content();
-        return objectMapper.readValue(responseJson, FbAnalyzerModel.class);
+        FbAnalyzerModel fbAnalyzerModel = objectMapper.readValue(responseJson, FbAnalyzerModel.class);
+        fbAnalyzerRepository.save(fbAnalyzerModel);
+        return fbAnalyzerModel;
     }
 
     public String summerizeText(String feedbackContent) {
@@ -90,5 +96,9 @@ public class FbAnalyzerService {
                 content();
     }
 
+    public List<FbAnalyzerModel> getAllFeedbacks() {
+        List<FbAnalyzerModel> fbAnalyzerModelList = fbAnalyzerRepository.findAll();
+        return fbAnalyzerModelList;
+    }
 
 }
