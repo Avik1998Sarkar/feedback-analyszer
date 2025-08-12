@@ -13,6 +13,7 @@ public class FbAnalyzerModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String summary;
+    private String customer_text;
     private String sentiment_type;
     private String score;
     private String based_on;

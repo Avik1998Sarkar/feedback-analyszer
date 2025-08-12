@@ -55,6 +55,7 @@ public class FbAnalyzerService {
                 .call()
                 .content();
         FbAnalyzerModel fbAnalyzerModel = objectMapper.readValue(responseJson, FbAnalyzerModel.class);
+        fbAnalyzerModel.setCustomer_text(feedbackContent);
         fbAnalyzerRepository.save(fbAnalyzerModel);
         return fbAnalyzerModel;
     }

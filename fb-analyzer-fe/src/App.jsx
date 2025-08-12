@@ -218,9 +218,10 @@ function App() {
                                         <table className="table table-bordered table-hover">
                                             <thead className="table-light">
                                                 <tr>
-                                                    <th>Summary</th>
+                                                    <th>Feedback Summary</th>
                                                     <th>Sentiment</th>
                                                     <th>Score</th>
+                                                    <th>Customer Feedback</th>
                                                     <th>Based On</th>
                                                 </tr>
                                             </thead>
@@ -240,6 +241,7 @@ function App() {
                                                             {r.sentiment_type}
                                                         </td>
                                                         <td>{r.score}</td>
+                                                        <td>{r.customer_text}</td>
                                                         <td>{r.based_on}</td>
                                                     </tr>
                                                 ))}
