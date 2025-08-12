@@ -1,12 +1,41 @@
-# React + Vite
+# Feedback Analyzer Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Feedback Analysis project, built with **React** using **Vite** as the build tool. It provides a user-friendly interface to submit feedback text and optional image files, uses speech-to-text for voice input, and displays analysis results fetched from the backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React (with hooks)
+- Vite (fast frontend build tool)
+- Axios (for HTTP requests)
+- Bootstrap 5 + Bootstrap Icons (UI styling)
+- Web Speech API (speech recognition)
+- Browser Media API (audio visualization)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Features
+
+- Text input and optional image upload for feedback
+- Real-time speech-to-text voice input with animated waveform
+- Submit feedback to backend for AI analysis
+- View detailed analysis results (sentiment, summary, score)
+- Fetch and display all stored feedback reports in a modal table
+- Responsive, clean UI styled with Bootstrap
+
+---
+
+## Setup & Run
+
+1. Clone the repository  
+2. Navigate to the frontend directory  
+3. Install dependencies:
+
+```bash
+npm install
+```
+4. Start the development server
+```bash
+npm run dev
+```
