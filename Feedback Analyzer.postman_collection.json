@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "eb5450e3-7cfd-4074-bca6-66e34125bbac",
+		"name": "Feedback Analyzer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10914353",
+		"_collection_link": "https://martian-satellite-398887.postman.co/workspace/My-Workspace~66ac3103-13f5-4a7b-88ed-f0494a212352/collection/10914353-eb5450e3-7cfd-4074-bca6-66e34125bbac?action=share&source=collection_link&creator=10914353"
+	},
+	"item": [
+		{
+			"name": "Feedback Analyzer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "feedbackContent   ",
+							"value": "This is the product i received from macys, not much satisfied",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/avik/Codes/Projects/feedback-analyszer/sample-images/torned-tshirt.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/fb-analyser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"fb-analyser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Feedback Analyzer Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/fb-analyser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"fb-analyser"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "8080",
+			"value": "http://localhost:8080",
+			"type": "default"
+		}
+	]
+}
