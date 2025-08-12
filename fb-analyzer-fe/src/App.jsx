@@ -60,7 +60,7 @@ function App() {
                     recognitionRef.current.onend = null;
                     recognitionRef.current.abort && recognitionRef.current.abort();
                 }
-            } catch {}
+            } catch { }
             stopAudioProcessing();
         };
     }, []);
@@ -102,7 +102,7 @@ function App() {
     const stopAudioProcessing = () => {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         if (audioContextRef.current) {
-            audioContextRef.current.close().catch(() => {});
+            audioContextRef.current.close().catch(() => { });
             audioContextRef.current = null;
         }
         setWaveHeights([4, 4, 4]);
@@ -234,8 +234,8 @@ function App() {
                                                                 r.sentiment_type?.toLowerCase() === "positive"
                                                                     ? "text-success fw-bold"
                                                                     : r.sentiment_type?.toLowerCase() === "negative"
-                                                                    ? "text-danger fw-bold"
-                                                                    : "text-warning fw-bold"
+                                                                        ? "text-danger fw-bold"
+                                                                        : "text-warning fw-bold"
                                                             }
                                                         >
                                                             {r.sentiment_type}
@@ -286,14 +286,41 @@ function App() {
                                 <button
                                     type="button"
                                     className={`mic-btn position-absolute ${isListening ? "bg-danger" : "bg-primary"}`}
-                                    style={{ bottom: "10px", right: "10px", borderRadius: "50%", width: "40px", height: "40px", border: "none" }}
+                                    style={{
+                                        bottom: "10px",
+                                        right: "10px",
+                                        borderRadius: "50%",
+                                        width: "40px",
+                                        height: "40px",
+                                        border: "none",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center", // ✅ ensures vertical + horizontal centering
+                                        padding: 0
+                                    }}
                                     onClick={handleMicClick}
                                     title={isListening ? "Stop Recording" : "Start Recording"}
                                 >
                                     {isListening ? (
-                                        <div style={{ display: "flex", gap: "2px" }}>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                gap: "2px",
+                                                alignItems: "center", // ✅ center waveform vertically inside flex
+                                                height: "60%" // keeps waveform visually balanced
+                                            }}
+                                        >
                                             {waveHeights.map((h, i) => (
-                                                <span key={i} style={{ display: "block", width: "3px", height: `${h}px`, background: "white" }}></span>
+                                                <span
+                                                    key={i}
+                                                    style={{
+                                                        display: "block",
+                                                        width: "3px",
+                                                        height: `${h}px`,
+                                                        background: "white",
+                                                        borderRadius: "2px"
+                                                    }}
+                                                ></span>
                                             ))}
                                         </div>
                                     ) : (
@@ -373,10 +400,10 @@ function App() {
                         <div className="card mt-4 p-4 shadow-sm">
                             <h4
                                 className={`fw-bold mb-3 ${result.sentiment_type?.toLowerCase() === "positive"
-                                        ? "text-success"
-                                        : result.sentiment_type?.toLowerCase() === "negative"
-                                            ? "text-danger"
-                                            : "text-warning"
+                                    ? "text-success"
+                                    : result.sentiment_type?.toLowerCase() === "negative"
+                                        ? "text-danger"
+                                        : "text-warning"
                                     }`}
                             >
                                 <i className="bi bi-bar-chart-fill me-2"></i> Analysis Result
