@@ -11,7 +11,8 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [showResult, setShowResult] = useState(false);
     const [isListening, setIsListening] = useState(false);
-    const [waveHeights, setWaveHeights] = useState([4, 4, 4]); // heights for bars
+    const [waveHeights, setWaveHeights] = useState([4, 4, 4]);
+    const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
 
     const recognitionRef = useRef(null);
     const audioContextRef = useRef(null);
@@ -19,7 +20,7 @@ function App() {
     const sourceRef = useRef(null);
     const rafRef = useRef(null);
 
-    // Setup Speech Recognition
+    // Speech Recognition
     useEffect(() => {
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -45,8 +46,24 @@ function App() {
 
             recognitionRef.current = recognition;
         } else {
-            alert("Speech recognition is not supported in this browser.");
+            // keep the original behavior but non-blocking
+            console.warn("Speech recognition is not supported in this browser.");
         }
+
+        // cleanup on unmount
+        return () => {
+            try {
+                if (recognitionRef.current) {
+                    recognitionRef.current.onresult = null;
+                    recognitionRef.current.onend = null;
+                    recognitionRef.current.abort && recognitionRef.current.abort();
+                }
+            } catch (e) {
+                // ignore
+            }
+            stopAudioProcessing();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const startAudioProcessing = async () => {
@@ -65,9 +82,8 @@ function App() {
             const animateWave = () => {
                 analyserRef.current.getByteFrequencyData(dataArray);
                 const avg = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-                const normalized = Math.min(avg / 5, 14); // scale for visual
+                const normalized = Math.min(avg / 5, 14);
 
-                // Create variation for 3 bars
                 setWaveHeights([
                     Math.max(4, normalized),
                     Math.max(4, normalized * 0.6 + 2),
@@ -86,10 +102,10 @@ function App() {
     const stopAudioProcessing = () => {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         if (audioContextRef.current) {
-            audioContextRef.current.close();
+            audioContextRef.current.close().catch(() => { });
             audioContextRef.current = null;
         }
-        setWaveHeights([4, 4, 4]); // reset bars
+        setWaveHeights([4, 4, 4]);
     };
 
     const handleMicClick = () => {
@@ -161,89 +177,141 @@ function App() {
             }}
         >
             <style>{`
-        .card-white {
-          background: #ffffff;
-          border-radius: 16px;
-          border: 1px solid #dee2e6;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-          animation: dropIn 0.8s ease forwards;
-        }
-        @keyframes dropIn {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .btn-accent {
-          background-color: #0d6efd;
-          border: none;
-          transition: all 0.3s ease;
-        }
-        .btn-accent:hover {
-          background-color: #0b5ed7;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-        }
-        .preview-img {
-          animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .skeleton {
-          background: linear-gradient(90deg, #f1f3f5 25%, #e9ecef 50%, #f1f3f5 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite;
-          border-radius: 8px;
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        /* Mic Button Styles */
-        .mic-btn {
-          position: absolute;
-          bottom: 10px;
-          right: 10px;
-          border: none;
-          background-color: #0d6efd;
-          color: white;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-          overflow: hidden;
-        }
-        .mic-btn:hover {
-          background-color: #0b5ed7;
-          transform: scale(1.05);
-        }
-        .mic-btn.listening {
-          background-color: #dc3545;
-        }
-        /* Live waveform bars */
-        .waveform {
-          display: flex;
-          align-items: flex-end;
-          justify-content: center;
-          gap: 2px;
-          height: 16px;
-        }
-        .waveform span {
-          display: block;
-          width: 3px;
-          background: white;
-          border-radius: 2px;
-        }
-      `}</style>
+                .card-white {
+                  background: #ffffff;
+                  border-radius: 16px;
+                  border: 1px solid #dee2e6;
+                  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+                  animation: dropIn 0.8s ease forwards;
+                }
+                @keyframes dropIn {
+                  from { opacity: 0; transform: translateY(-20px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+                .btn-accent {
+                  background-color: #0d6efd;
+                  border: none;
+                  transition: all 0.3s ease;
+                }
+                .btn-accent:hover {
+                  background-color: #0b5ed7;
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+                }
+                .preview-img {
+                  animation: fadeIn 0.35s ease;
+                  display: block;
+                  margin: 0 auto;
+                  border-radius: 8px;
+                  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+                  object-fit: contain;
+                  transition: max-height 0.35s ease, transform 0.25s ease;
+                  max-width: 100%;
+                }
+                @keyframes fadeIn {
+                  from { opacity: 0; transform: scale(0.98); }
+                  to { opacity: 1; transform: scale(1); }
+                }
+                .preview-close-btn {
+                    top: 6px;
+                    right: 6px;
+                    background-color: rgba(255,255,255,0.95);
+                    border-radius: 50%;
+                    padding: 6px;
+                    opacity: 0;
+                    transition: opacity 0.2s ease, transform 0.15s ease;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+                    z-index: 3;
+                }
+                .preview-wrapper:hover .preview-close-btn {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                .preview-expand-btn {
+                    position: absolute;
+                    left: 50%;
+                    bottom: 8px;
+                    transform: translateX(-50%);
+                    z-index: 3;
+                    background-color: rgba(255,255,255,0.95);
+                    border: 1px solid rgba(0,0,0,0.06);
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    font-size: 0.85rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+                    opacity: 0; /* hidden initially */
+                }
+                .preview-wrapper:hover .preview-expand-btn {
+                    opacity: 1;
+                }
+                .preview-expand-btn:hover {
+                    transform: translateX(-50%) scale(1.03);
+                }
+                .skeleton {
+                  background: linear-gradient(90deg, #f1f3f5 25%, #e9ecef 50%, #f1f3f5 75%);
+                  background-size: 200% 100%;
+                  animation: shimmer 1.5s infinite;
+                  border-radius: 8px;
+                }
+                @keyframes shimmer {
+                  0% { background-position: -200% 0; }
+                  100% { background-position: 200% 0; }
+                }
+                .mic-btn {
+                  position: absolute;
+                  bottom: 10px;
+                  right: 10px;
+                  border: none;
+                  background-color: #0d6efd;
+                  color: white;
+                  border-radius: 50%;
+                  width: 40px;
+                  height: 40px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+                  overflow: hidden;
+                }
+                .mic-btn:hover {
+                  background-color: #0b5ed7;
+                  transform: scale(1.05);
+                }
+                .mic-btn.listening {
+                  background-color: #dc3545;
+                }
+                .waveform {
+                  display: flex;
+                  align-items: flex-end;
+                  justify-content: center;
+                  gap: 2px;
+                  height: 16px;
+                }
+                .waveform span {
+                  display: block;
+                  width: 3px;
+                  background: white;
+                  border-radius: 2px;
+                }
+                /* new preview wrapper that centers the image and provides overlays */
+                .preview-wrapper {
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+                  overflow: visible;
+                  max-width: 100%;
+                }
+            `}</style>
 
             <div className="row justify-content-center w-100">
                 <div className="col-lg-6">
-                    {/* Feedback Form Card */}
                     <div className="card card-white p-4">
                         <h3 className="text-center mb-4 fw-bold text-primary">
                             <i className="bi bi-chat-square-text-fill me-2"></i>
@@ -290,14 +358,57 @@ function App() {
                                     accept="image/*"
                                     onChange={handleFileChange}
                                 />
+
+                                {/* centered preview container */}
                                 {preview && (
-                                    <div className="mt-3 text-center">
-                                        <img
-                                            src={preview}
-                                            alt="Preview"
-                                            className="img-fluid rounded preview-img"
-                                            style={{ maxHeight: "200px" }}
-                                        />
+                                    <div className="mt-3 d-flex justify-content-center">
+                                        <div
+                                            className="preview-wrapper"
+                                            style={{ maxWidth: isPreviewExpanded ? 720 : 320 }}
+                                        >
+                                            {/* Close Button (appears on hover) */}
+                                            <button
+                                                type="button"
+                                                className="btn-close position-absolute preview-close-btn"
+                                                aria-label="Close preview"
+                                                onClick={() => {
+                                                    setPreview(null);
+                                                    setFile(null);
+                                                    setIsPreviewExpanded(false);
+                                                }}
+                                            ></button>
+
+                                            {/* Preview Image */}
+                                            <img
+                                                src={preview}
+                                                alt="Preview"
+                                                className="img-fluid rounded preview-img"
+                                                style={{
+                                                    maxHeight: isPreviewExpanded ? "480px" : "140px",
+                                                    transition: "max-height 0.35s ease, box-shadow 0.25s ease",
+                                                    width: "auto"
+                                                }}
+                                            />
+
+                                            {/* Expand / Collapse Button - overlay at bottom-center */}
+                                            <button
+                                                type="button"
+                                                className="preview-expand-btn"
+                                                onClick={() => setIsPreviewExpanded(!isPreviewExpanded)}
+                                            >
+                                                {isPreviewExpanded ? (
+                                                    <>
+                                                        <i className="bi bi-arrows-collapse"></i>
+                                                        <span>Collapse</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="bi bi-arrows-expand"></i>
+                                                        <span>Expand</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -323,7 +434,6 @@ function App() {
                         </form>
                     </div>
 
-                    {/* Loading Skeleton */}
                     {loading && (
                         <div className="card card-white mt-4 p-4">
                             <div className="skeleton mb-3" style={{ height: "20px", width: "50%" }}></div>
@@ -333,7 +443,6 @@ function App() {
                         </div>
                     )}
 
-                    {/* Result Section */}
                     {result && !loading && (
                         <div
                             className={`card card-white mt-4 p-4 ${showResult ? "show" : ""}`}

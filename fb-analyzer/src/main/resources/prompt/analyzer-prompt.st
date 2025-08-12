@@ -20,10 +20,9 @@ Respond in this format and make json with below fields:
 "summary": (brief summary),
 "sentiment_type": (POSITIVE, NEUTRAL, or NEGATIVE),
 "score": (decimal between -1 and 1),
-"based_on": [
-            "Respond only based on the text summary [Image not present / Image not related]",
+"based_on": ("Respond only based on the text summary [Image not present / Image not related]",
             "Respond only based on the image summary [Text not related]",
-            or "Unable to recognize both Text and Image summaries"]
+            or "Unable to recognize both Text and Image summaries")
 
 Final output should be a JSON object with the above fields.
 Make sure to provide a concise and accurate summary based on the feedback provided.
