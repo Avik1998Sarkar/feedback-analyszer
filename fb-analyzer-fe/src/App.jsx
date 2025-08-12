@@ -25,6 +25,10 @@ function App() {
     const sourceRef = useRef(null);
     const rafRef = useRef(null);
 
+    useEffect(() => {
+        document.title = "Feedback Analyzer";
+    }, []);
+    
     // Speech Recognition Setup
     useEffect(() => {
         const SpeechRecognition =
@@ -181,6 +185,7 @@ function App() {
     }, [result]);
 
     return (
+        
         <div
             className="container-fluid min-vh-100 position-relative"
             style={{
